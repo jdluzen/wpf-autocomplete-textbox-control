@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using DragonZ.Actb.Provider;
 
-namespace dragonz.actb.provider
+namespace DragonZ.Actb.SampleProviders
 {
     public class FileSysDataProvider : IAutoCompleteDataProvider, IAutoAppendDataProvider
     {

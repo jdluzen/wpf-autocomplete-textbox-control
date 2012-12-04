@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DragonZ.Actb.Provider;
 using Microsoft.Win32;
 
-namespace dragonz.actb.provider
+namespace DragonZ.Actb.SampleProviders
 {
     public class RegistryDataProvider : IAutoCompleteDataProvider
     {

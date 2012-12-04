@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Controls;
-using dragonz.actb.core;
-using dragonz.actb.provider;
+﻿using System.Windows.Controls;
+using DragonZ.Actb.Core;
 
-namespace dragonz.actb.control
+namespace DragonZ.Actb.Control
 {
     public class AutoCompleteTextBox : TextBox
     {
@@ -20,7 +15,6 @@ namespace dragonz.actb.control
         public AutoCompleteTextBox()
         {
             _acm = new AutoCompleteManager();
-            _acm.DataProvider = new FileSysDataProvider();
             this.Loaded += AutoCompleteTextBox_Loaded;
         }
 

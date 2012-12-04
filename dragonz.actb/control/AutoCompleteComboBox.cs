@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using dragonz.actb.core;
+using DragonZ.Actb.Core;
 
-namespace dragonz.actb.control
+namespace DragonZ.Actb.Control
 {
     public class AutoCompleteComboBox : ComboBox
     {

@@ -91,6 +91,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="..\DragonZ.Actb\Properties\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -128,9 +131,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\dragonz.actb\dragonz.actb.csproj">
+    <ProjectReference Include="..\DragonZ.Actb.SampleProviders\DragonZ.Actb.SampleProviders.csproj">
+      <Project>{02CB1718-B40A-48E1-B7C8-8A0EC07716A4}</Project>
+      <Name>DragonZ.Actb.SampleProviders</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\dragonz.actb\DragonZ.Actb.csproj">
       <Project>{89BC47C7-F14D-46C5-8B9B-0DB90CE2AC42}</Project>
-      <Name>dragonz.actb</Name>
+      <Name>DragonZ.Actb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

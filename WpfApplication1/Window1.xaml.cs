@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Web;
 using System.Windows;
 using System.Windows.Input;
-using dragonz.actb.core;
-using dragonz.actb.provider;
+using DragonZ.Actb.Core;
+using DragonZ.Actb.SampleProviders;
 
 namespace WpfApplication1
 {
@@ -20,7 +15,7 @@ namespace WpfApplication1
         private AutoCompleteManager _acmBingSuggestion;
         private AutoCompleteManager _acmRegistryPath;
         private AutoCompleteManager _acmUrlHistory;
-
+        private AutoCompleteManager _acmFile;
         public Window1()
         {
             InitializeComponent();
@@ -43,6 +38,8 @@ namespace WpfApplication1
             _acmUrlHistory.DataProvider = new UrlHistoryDataProvider();
             //_acmUrlHistory.Asynchronous = true;
             _acmUrlHistory.AutoAppend = true;
+            _acmFile = new AutoCompleteManager(txtFileSysPath);
+            _acmFile.DataProvider = new FileSysDataProvider();
         }
 
         void txtBingSearch_KeyDown(object sender, KeyEventArgs e)
@@ -65,13 +62,13 @@ namespace WpfApplication1
 
         private void ChkIncludeFiles_Click(object sender, RoutedEventArgs e)
         {
-            var fileSysDataProvider = actbFileSysPath.AutoCompleteManager.DataProvider as FileSysDataProvider;
+            var fileSysDataProvider = _acmFile.DataProvider as FileSysDataProvider;
             fileSysDataProvider.IncludeFiles = chkIncludeFiles.IsChecked.Value;
         }
 
         private void ChkAutoAppend_Click(object sender, RoutedEventArgs e)
         {
-            actbFileSysPath.AutoCompleteManager.AutoAppend = chkAutoAppend.IsChecked.Value;
+            _acmFile.AutoAppend = chkAutoAppend.IsChecked.Value;
         }
     }
 }

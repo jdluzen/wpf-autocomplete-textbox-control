@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using DragonZ.Actb.Provider;
 
-namespace dragonz.actb.provider
+namespace DragonZ.Actb.SampleProviders
 {
     public class SimpleStaticDataProvider : IAutoCompleteDataProvider
     {

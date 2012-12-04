@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace dragonz.actb.provider
+namespace DragonZ.Actb.Provider
 {
     public interface IAutoCompleteDataProvider
     {

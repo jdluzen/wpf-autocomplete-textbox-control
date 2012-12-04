@@ -9,11 +9,10 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using dragonz.actb.provider;
+using DragonZ.Actb.Provider;
 using Microsoft.Windows.Themes;
 
-namespace dragonz.actb.core
+namespace DragonZ.Actb.Core
 {
     public class AutoCompleteManager
     {
@@ -39,7 +38,6 @@ namespace dragonz.actb.core
         private string _textBeforeChangedByCode;
         private bool _textChangedByCode;
 
-        private TextBox _textBox;
         private Popup _popup;
         private SystemDropShadowChrome _chrome;
         private ListBox _listBox;
@@ -96,6 +94,8 @@ namespace dragonz.actb.core
             set { _autoAppend = value; }
         }
 
+        public TextBox TextBox { get; private set; }
+
         /*+---------------------------------------------------------------------+
           |                                                                     |
           |                       Initialier                                    |
@@ -114,7 +114,7 @@ namespace dragonz.actb.core
 
         public void AttachTextBox(TextBox textBox)
         {
-            Debug.Assert(_textBox == null);
+            Debug.Assert(TextBox == null);
             if (Application.Current.Resources.FindName("AcTb_ListBoxStyle") == null)
             {
                 var myResourceDictionary = new ResourceDictionary();
@@ -124,8 +124,8 @@ namespace dragonz.actb.core
             }
 
             //
-            _textBox = textBox;
-            var ownerWindow = Window.GetWindow(_textBox);
+            TextBox = textBox;
+            var ownerWindow = Window.GetWindow(TextBox);
             if (ownerWindow.IsLoaded)
             {
                 Initialize();
@@ -209,7 +209,7 @@ namespace dragonz.actb.core
 
         private void SetupEventHandlers()
         {
-            var ownerWindow = Window.GetWindow(_textBox);
+            var ownerWindow = Window.GetWindow(TextBox);
             ownerWindow.PreviewMouseDown += OwnerWindow_PreviewMouseDown;
             ownerWindow.Deactivated += OwnerWindow_Deactivated;
 
@@ -219,9 +219,9 @@ namespace dragonz.actb.core
             hwndSource.AddHook(hwndSourceHook);
             //hwndSource.RemoveHook();?
 
-            _textBox.TextChanged += TextBox_TextChanged;
-            _textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
-            _textBox.LostFocus += TextBox_LostFocus;
+            TextBox.TextChanged += TextBox_TextChanged;
+            TextBox.PreviewKeyDown += TextBox_PreviewKeyDown;
+            TextBox.LostFocus += TextBox_LostFocus;
 
             _listBox.PreviewMouseLeftButtonDown += ListBox_PreviewMouseLeftButtonDown;
             _listBox.MouseLeftButtonUp += ListBox_MouseLeftButtonUp;
@@ -244,7 +244,7 @@ namespace dragonz.actb.core
             {
                 return;
             }
-            var text = _textBox.Text;
+            var text = TextBox.Text;
             if (string.IsNullOrEmpty(text))
             {
                 _popup.IsOpen = false;
@@ -260,7 +260,7 @@ namespace dragonz.actb.core
                 _asyncThread = new Thread(() => {
                     var items = _dataProvider.GetItems(text);
                     var dispatcher = Application.Current.Dispatcher;
-                    var currentText = dispatcher.Invoke(new Func<string>(() => _textBox.Text)).ToString();
+                    var currentText = dispatcher.Invoke(new Func<string>(() => TextBox.Text)).ToString();
                     if (text != currentText)
                     {
                         return;
@@ -286,7 +286,7 @@ namespace dragonz.actb.core
             if (e.Key == Key.Enter)
             {
                 _popup.IsOpen = false;
-                _textBox.SelectAll();
+                TextBox.SelectAll();
             }
             else if (e.Key == Key.Escape)
             {
@@ -533,7 +533,7 @@ namespace dragonz.actb.core
 
         private void OwnerWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.Source != _textBox)
+            if (e.Source != TextBox)
             {
                 _popup.IsOpen = false;
             }
@@ -561,7 +561,7 @@ namespace dragonz.actb.core
 
         private void PopulatePopupList(IEnumerable<string> items)
         {
-            var text = _textBox.Text;
+            var text = TextBox.Text;
             
             _listBox.ItemsSource = items;
             if (_listBox.Items.Count == 0)
@@ -582,9 +582,9 @@ namespace dragonz.actb.core
                 ShowPopup();
 
                 //
-                if (AutoAppend && !_supressAutoAppend && 
-                     _textBox.SelectionLength == 0 && 
-                     _textBox.SelectionStart == _textBox.Text.Length)
+                if (AutoAppend && !_supressAutoAppend &&
+                     TextBox.SelectionLength == 0 &&
+                     TextBox.SelectionStart == TextBox.Text.Length)
                 {
                     _textChangedByCode = true;
                     try
@@ -597,11 +597,11 @@ namespace dragonz.actb.core
                         }
                         else
                         {
-                            appendText = firstSuggestion.Substring(_textBox.Text.Length);
+                            appendText = firstSuggestion.Substring(TextBox.Text.Length);
                         }
                         if(!string.IsNullOrEmpty(appendText))
                         {
-                            _textBox.SelectedText = appendText;
+                            TextBox.SelectedText = appendText;
                         }
                     }
                     finally
@@ -643,12 +643,12 @@ namespace dragonz.actb.core
         {
             var popupOnTop = false;
 
-            var p = new Point(0, _textBox.ActualHeight);
-            p = _textBox.PointToScreen(p);
+            var p = new Point(0, TextBox.ActualHeight);
+            p = TextBox.PointToScreen(p);
             var tbBottom = p.Y;
 
             p = new Point(0, 0);
-            p = _textBox.PointToScreen(p);
+            p = TextBox.PointToScreen(p);
             var tbTop = p.Y;
 
             _popup.HorizontalOffset = p.X;
@@ -656,7 +656,7 @@ namespace dragonz.actb.core
 
             if (!_manualResized)
             {
-                _popup.Width = _textBox.ActualWidth + POPUP_SHADOW_DEPTH;
+                _popup.Width = TextBox.ActualWidth + POPUP_SHADOW_DEPTH;
             }
 
             double popupHeight;
@@ -697,14 +697,14 @@ namespace dragonz.actb.core
         private void UpdateText(string text, bool selectAll)
         {
             _textChangedByCode = true;
-            _textBox.Text = text;
+            TextBox.Text = text;
             if (selectAll)
             {
-                _textBox.SelectAll();
+                TextBox.SelectAll();
             }
             else
             {
-                _textBox.SelectionStart = text.Length;
+                TextBox.SelectionStart = text.Length;
             }
             _textChangedByCode = false;
         }

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using DragonZ.Actb.Provider;
 
-namespace dragonz.actb.provider
+namespace DragonZ.Actb.SampleProviders
 {
     public class FileSysPathDataProvider : IAutoCompleteDataProvider
     {
