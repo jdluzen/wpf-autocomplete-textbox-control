@@ -95,6 +95,7 @@ namespace DragonZ.Actb.Core
         }
 
         public TextBox TextBox { get; private set; }
+        public int AsyncDelay { get; set; }
 
         /*+---------------------------------------------------------------------+
           |                                                                     |
@@ -123,21 +124,16 @@ namespace DragonZ.Actb.Core
                 Application.Current.Resources.MergedDictionaries.Add(myResourceDictionary);
             }
 
-            //
             TextBox = textBox;
             var ownerWindow = Window.GetWindow(TextBox);
-            if (ownerWindow.IsLoaded)
+            if (ownerWindow != null)
             {
-                Initialize();
+                if (ownerWindow.IsLoaded)
+                    Initialize();
+                else
+                    ownerWindow.Loaded += OwnerWindow_Loaded;
+                ownerWindow.LocationChanged += OwnerWindow_LocationChanged;
             }
-            else
-            {
-                ownerWindow.Loaded += OwnerWindow_Loaded;
-            }
-            ownerWindow.LocationChanged += OwnerWindow_LocationChanged;
-
-            //
-            //_dataProvider = new FileSysDataProvider();
         }
 
         private void OwnerWindow_LocationChanged(object sender, EventArgs e)
@@ -257,16 +253,27 @@ namespace DragonZ.Actb.Core
                 {
                     _asyncThread.Abort();
                 }
-                _asyncThread = new Thread(() => {
-                    var items = _dataProvider.GetItems(text);
-                    var dispatcher = Application.Current.Dispatcher;
-                    var currentText = dispatcher.Invoke(new Func<string>(() => TextBox.Text)).ToString();
-                    if (text != currentText)
+                _asyncThread = new Thread(() =>
+                {
+                    try
                     {
-                        return;
+                        if (AsyncDelay > 0)
+                            Thread.Sleep(AsyncDelay);
+                        var dispatcher = Application.Current.Dispatcher;
+                        string currentText = dispatcher.Invoke(new Func<string>(() => TextBox.Text)).ToString();
+                        if (text != currentText)
+                            return;
+                        var items = _dataProvider.GetItems(text);
+                        currentText = dispatcher.Invoke(new Func<string>(() => TextBox.Text)).ToString();
+                        if (text != currentText)
+                            return;
+                        dispatcher.Invoke(new Action(() => PopulatePopupList(items)));
                     }
-                    dispatcher.Invoke(new Action(() => PopulatePopupList(items)));
-                });
+                    catch (ThreadInterruptedException tie)
+                    {
+                        Debug.Print("Interrupted");
+                    }
+                }) { IsBackground = true };
                 _asyncThread.Start();
             }
             else

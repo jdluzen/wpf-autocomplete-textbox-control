@@ -73,7 +73,7 @@ namespace DragonZ.Actb.Control
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _textBox = GetTemplateChild("PART_EditableTextBox") as TextBox;
+            _textBox = Template.FindName("PART_EditableTextBox", this) as TextBox;
             _acm.AttachTextBox(_textBox);
         }
     }
