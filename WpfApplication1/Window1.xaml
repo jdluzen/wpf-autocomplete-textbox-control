@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:Actb.Control="clr-namespace:DragonZ.Actb.Control;assembly=DragonZ.Actb"
         xmlns:Microsoft_Windows_Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" x:Class="WpfApplication1.Window1"
-        Title="Window1" Height="286" Width="620" mc:Ignorable="d"
+        Title="Window1" Height="300" Width="620" mc:Ignorable="d"
     FocusManager.FocusedElement="{Binding ElementName=txtBingSearch}">
     <Window.Resources>
         <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" StartPoint="0,0" MappingMode="Absolute">
@@ -90,5 +90,16 @@
             <CheckBox x:Name="chkIncludeFiles" Click="ChkIncludeFiles_Click" Content="_Include Files"/>
             <CheckBox x:Name="chkAutoAppend" Click="ChkAutoAppend_Click" Content="Auto _Append" Margin="10 0 0 0"/>
         </StackPanel>
+        <Label VerticalAlignment="Center" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Content="_Objects:" Target="{Binding ElementName=acbObjects}"/>
+        <Actb.Control:AutoCompleteTextBox x:Name="acbObjects" Grid.Column="3" Grid.Row="6" VerticalAlignment="Center">
+            <Actb.Control:AutoCompleteTextBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Key}" />
+                        <TextBlock Text="{Binding Value}" />
+                    </StackPanel>
+                </DataTemplate>
+            </Actb.Control:AutoCompleteTextBox.ItemTemplate>
+        </Actb.Control:AutoCompleteTextBox>
     </Grid>
 </Window>

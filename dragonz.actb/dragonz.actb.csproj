@@ -73,6 +73,7 @@
     <Compile Include="Control\AutoCompleteComboBox.cs" />
     <Compile Include="Control\AutoCompleteTextBox.cs" />
     <Compile Include="Core\AutoCompleteManager.cs" />
+    <Compile Include="Core\SelectionAcceptedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfoCommon.cs" />
     <Compile Include="Provider\IAutoAppendDataProvider.cs" />
     <Compile Include="Provider\IAutoCompleteDataProvider.cs" />

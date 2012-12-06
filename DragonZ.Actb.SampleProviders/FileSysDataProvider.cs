@@ -35,7 +35,12 @@ namespace DragonZ.Actb.SampleProviders
         //
         public bool IncludeFiles{ get; set;}
 
-        public IEnumerable<string> GetItems(string textPattern)
+        public string GetStringValue(object o)
+        {
+            return (string)o;
+        }
+
+        public IEnumerable<object> GetItems(string textPattern)
         {
             if (textPattern.Length < 2 || textPattern[1] != ':')
             {

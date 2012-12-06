@@ -14,7 +14,12 @@ namespace DragonZ.Actb.SampleProviders
             Registry.CurrentConfig
         };
 
-        public IEnumerable<string> GetItems(string textPattern)
+        public string GetStringValue(object o)
+        {
+            return (string)o;
+        }
+
+        public IEnumerable<object> GetItems(string textPattern)
         {
             var result = new List<string>();
             var parts = textPattern.Split('\\');

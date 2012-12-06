@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using DragonZ.Actb.Provider;
 
@@ -9,7 +10,12 @@ namespace DragonZ.Actb.SampleProviders
     {
         private List<string> _historyUrls;
 
-        public IEnumerable<string> GetItems(string textPattern)
+        public string GetStringValue(object o)
+        {
+            return (string)o;
+        }
+
+        public IEnumerable<object> GetItems(string textPattern)
         {
             if(_historyUrls == null)
             {
@@ -39,7 +45,7 @@ namespace DragonZ.Actb.SampleProviders
             if (!textPattern.StartsWith("http://") && !textPattern.StartsWith("www."))
             {
                 pattern = "http://www." + textPattern;
-                result.AddRange(GetItems(pattern));
+                result.AddRange(GetItems(pattern).Select(o => (string)o));
             }
             return result;
         }

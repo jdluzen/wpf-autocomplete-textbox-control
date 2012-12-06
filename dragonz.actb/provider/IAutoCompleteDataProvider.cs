@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DragonZ.Actb.Provider
 {
     public interface IAutoCompleteDataProvider
     {
-        IEnumerable<string> GetItems(string textPattern);
+        IEnumerable<object> GetItems(string textPattern);
+
+        string GetStringValue(object o);
     }
 }

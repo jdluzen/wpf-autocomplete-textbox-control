@@ -6,22 +6,27 @@ namespace DragonZ.Actb.SampleProviders
 {
     public class SimpleStaticDataProvider : IAutoCompleteDataProvider
     {
-        private IEnumerable<string> _source;
+        private IEnumerable<object> _source;
 
-        public SimpleStaticDataProvider(IEnumerable<string> source)
+        public SimpleStaticDataProvider(IEnumerable<object> source)
         {
             _source = source;
         }
 
-        public IEnumerable<string> GetItems(string textPattern)
+        public IEnumerable<object> GetItems(string textPattern)
         {
-            foreach (var item in _source)
+            foreach (string item in _source)
             {
                 if (item.StartsWith(textPattern, StringComparison.OrdinalIgnoreCase))
                 {
                     yield return item;
                 }
             }
+        }
+
+        public string GetStringValue(object o)
+        {
+            return (string)o;
         }
     }
 }

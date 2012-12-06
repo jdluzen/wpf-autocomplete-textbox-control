@@ -16,6 +16,7 @@ namespace WpfApplication1
         private AutoCompleteManager _acmRegistryPath;
         private AutoCompleteManager _acmUrlHistory;
         private AutoCompleteManager _acmFile;
+        
         public Window1()
         {
             InitializeComponent();
@@ -40,6 +41,10 @@ namespace WpfApplication1
             _acmUrlHistory.AutoAppend = true;
             _acmFile = new AutoCompleteManager(txtFileSysPath);
             _acmFile.DataProvider = new FileSysDataProvider();
+
+            acbObjects.AutoCompleteManager.AsyncDelay = 300;
+            acbObjects.AutoCompleteManager.Asynchronous = true;
+            acbObjects.AutoCompleteManager.DataProvider = new HashCodeDataProvider();
         }
 
         void txtBingSearch_KeyDown(object sender, KeyEventArgs e)

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using DragonZ.Actb.Core;
 
 namespace DragonZ.Actb.Control
@@ -18,10 +19,29 @@ namespace DragonZ.Actb.Control
             this.Loaded += AutoCompleteTextBox_Loaded;
         }
 
-        void AutoCompleteTextBox_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        void AutoCompleteTextBox_Loaded(object sender, RoutedEventArgs e)
         {
             _acm.AttachTextBox(this);
+            ItemTemplate = itemTemplate;
         }
-        
+
+        protected DataTemplate itemTemplate;
+        public DataTemplate ItemTemplate
+        {
+            get
+            {
+                return _acm.ListBox.ItemTemplate;
+            }
+            set
+            {
+                if (_acm.ListBox != null)
+                {
+                    _acm.ListBox.ItemTemplate = value;
+                    itemTemplate = null;
+                    return;
+                }
+                itemTemplate = value;//delay until loaded
+            }
+        }
     }
 }

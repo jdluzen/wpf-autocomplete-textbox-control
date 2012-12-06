@@ -14,7 +14,12 @@ namespace WpfApplication1
         private const string _uriFormat = "http://api.bing.net/osjson.aspx?query={0}";
         private readonly JavaScriptSerializer _jsonSerializer = new JavaScriptSerializer();
 
-        public IEnumerable<string> GetItems(string textPattern)
+        public string GetStringValue(object o)
+        {
+            return (string)o;
+        }
+
+        public IEnumerable<object> GetItems(string textPattern)
         {
             WebRequest request = null;
             WebResponse response = null;

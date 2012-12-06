@@ -45,6 +45,7 @@
     </Compile>
     <Compile Include="FileSysDataProvider.cs" />
     <Compile Include="FileSysPathDataProvider.cs" />
+    <Compile Include="HashCodeDataProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryDataProvider.cs" />
     <Compile Include="SimpleStaticDataProvider.cs" />

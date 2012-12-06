@@ -40,7 +40,6 @@ namespace DragonZ.Actb.Core
 
         private Popup _popup;
         private SystemDropShadowChrome _chrome;
-        private ListBox _listBox;
         private ScrollBar _scrollBar;
         private ResizeGrip _resizeGrip;
         private ScrollViewer _scrollViewer;
@@ -95,7 +94,14 @@ namespace DragonZ.Actb.Core
         }
 
         public TextBox TextBox { get; private set; }
+
         public int AsyncDelay { get; set; }
+
+        public ListBox ListBox { get; set; }
+
+        public event EventHandler PopupOpened;
+
+        public event EventHandler<SelectionAcceptedEventArgs> SelectionAccepted;
 
         /*+---------------------------------------------------------------------+
           |                                                                     |
@@ -148,15 +154,15 @@ namespace DragonZ.Actb.Core
 
         private void Initialize()
         {
-            _listBox = new ListBox();
+            ListBox = new ListBox();
             var tempItem = new ListBoxItem {Content = "TEMP_ITEM_FOR_MEASUREMENT"};
-            _listBox.Items.Add(tempItem);
-            _listBox.Focusable = false;
-            _listBox.Style = (Style) Application.Current.Resources["AcTb_ListBoxStyle"];
+            ListBox.Items.Add(tempItem);
+            ListBox.Focusable = false;
+            ListBox.Style = (Style) Application.Current.Resources["AcTb_ListBoxStyle"];
 
             _chrome = new SystemDropShadowChrome();
             _chrome.Margin = new Thickness(0, 0, POPUP_SHADOW_DEPTH, POPUP_SHADOW_DEPTH);
-            _chrome.Child = _listBox;
+            _chrome.Child = ListBox;
 
             _popup = new Popup();
             _popup.SnapsToDevicePixels = true;
@@ -168,7 +174,7 @@ namespace DragonZ.Actb.Core
             _popup.IsOpen = true;
 
             _itemHeight = tempItem.ActualHeight;
-            _listBox.Items.Clear();
+            ListBox.Items.Clear();
 
             //
             GetInnerElementReferences();
@@ -178,7 +184,7 @@ namespace DragonZ.Actb.Core
 
         private void GetInnerElementReferences()
         {
-            _scrollViewer = (_listBox.Template.FindName("Border", _listBox) as Border).Child as ScrollViewer;
+            _scrollViewer = (ListBox.Template.FindName("Border", ListBox) as Border).Child as ScrollViewer;
             _resizeGrip = _scrollViewer.Template.FindName("ResizeGrip", _scrollViewer) as ResizeGrip;
             _scrollBar = _scrollViewer.Template.FindName("PART_VerticalScrollBar", _scrollViewer) as ScrollBar;
         }
@@ -219,9 +225,9 @@ namespace DragonZ.Actb.Core
             TextBox.PreviewKeyDown += TextBox_PreviewKeyDown;
             TextBox.LostFocus += TextBox_LostFocus;
 
-            _listBox.PreviewMouseLeftButtonDown += ListBox_PreviewMouseLeftButtonDown;
-            _listBox.MouseLeftButtonUp += ListBox_MouseLeftButtonUp;
-            _listBox.PreviewMouseMove += ListBox_PreviewMouseMove;
+            ListBox.PreviewMouseLeftButtonDown += ListBox_PreviewMouseLeftButtonDown;
+            ListBox.MouseLeftButtonUp += ListBox_MouseLeftButtonUp;
+            ListBox.PreviewMouseMove += ListBox_PreviewMouseMove;
 
             _resizeGrip.PreviewMouseLeftButtonDown += ResizeGrip_PreviewMouseLeftButtonDown;
             _resizeGrip.PreviewMouseMove += ResizeGrip_PreviewMouseMove;
@@ -251,7 +257,7 @@ namespace DragonZ.Actb.Core
 
                 if (_asyncThread != null && _asyncThread.IsAlive)
                 {
-                    _asyncThread.Abort();
+                    _asyncThread.Interrupt();
                 }
                 _asyncThread = new Thread(() =>
                 {
@@ -288,28 +294,35 @@ namespace DragonZ.Actb.Core
             _supressAutoAppend = e.Key == Key.Delete || e.Key == Key.Back;
             if (!_popup.IsOpen)
             {
-                return;
+                if (e.Key != Key.Down || ListBox.Items.Count == 0)
+                    return;
             }
             if (e.Key == Key.Enter)
             {
                 _popup.IsOpen = false;
                 TextBox.SelectAll();
+                EventHandler<SelectionAcceptedEventArgs> handler = SelectionAccepted;
+                if (handler != null)
+                    handler(this, new SelectionAcceptedEventArgs { SelectedObject = ListBox.SelectedItem });
             }
             else if (e.Key == Key.Escape)
             {
+                if (_popup.IsOpen)
+                    UpdateText(_textBeforeChangedByCode, false);
                 _popup.IsOpen = false;
                 e.Handled = true;
             }
             if (!_popup.IsOpen)
             {
-                return;
+                if (e.Key != Key.Down || ListBox.Items.Count == 0)
+                    return;
             }
-            var index = _listBox.SelectedIndex;
+            var index = ListBox.SelectedIndex;
             if (e.Key == Key.PageUp)
             {
                 if (index == -1)
                 {
-                    index = _listBox.Items.Count - 1;
+                    index = ListBox.Items.Count - 1;
                 }
                 else if (index == 0)
                 {
@@ -334,16 +347,16 @@ namespace DragonZ.Actb.Core
                 {
                     index = 0;
                 }
-                else if (index == _listBox.Items.Count - 1)
+                else if (index == ListBox.Items.Count - 1)
                 {
                     index = -1;
                 }
                 else if (index == _scrollBar.Value + _scrollBar.ViewportSize - 1)
                 {
                     index += (int) _scrollBar.ViewportSize - 1;
-                    if (index > _listBox.Items.Count - 1)
+                    if (index > ListBox.Items.Count - 1)
                     {
-                        index = _listBox.Items.Count - 1;
+                        index = ListBox.Items.Count - 1;
                     }
                 }
                 else
@@ -355,7 +368,7 @@ namespace DragonZ.Actb.Core
             {
                 if (index == -1)
                 {
-                    index = _listBox.Items.Count - 1;
+                    index = ListBox.Items.Count - 1;
                 }
                 else
                 {
@@ -364,22 +377,24 @@ namespace DragonZ.Actb.Core
             }
             else if (e.Key == Key.Down)
             {
+                if (!_popup.IsOpen)
+                    _popup.IsOpen = true;
                 ++index;
             }
 
-            if (index != _listBox.SelectedIndex)
+            if (index != ListBox.SelectedIndex)
             {
                 string text;
-                if (index < 0 || index > _listBox.Items.Count - 1)
+                if (index < 0 || index > ListBox.Items.Count - 1)
                 {
                     text = _textBeforeChangedByCode;
-                    _listBox.SelectedIndex = -1;
+                    ListBox.SelectedIndex = -1;
                 }
                 else
                 {
-                    _listBox.SelectedIndex = index;
-                    _listBox.ScrollIntoView(_listBox.SelectedItem);
-                    text = _listBox.SelectedItem as string;
+                    ListBox.SelectedIndex = index;
+                    ListBox.ScrollIntoView(ListBox.SelectedItem);
+                    text =_dataProvider.GetStringValue(ListBox.SelectedItem);
                 }
                 UpdateText(text, false);
                 e.Handled = true;
@@ -399,8 +414,8 @@ namespace DragonZ.Actb.Core
 
         private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var pos = e.GetPosition(_listBox);
-            var hitTestResult = VisualTreeHelper.HitTest(_listBox, pos);
+            var pos = e.GetPosition(ListBox);
+            var hitTestResult = VisualTreeHelper.HitTest(ListBox, pos);
             if (hitTestResult == null)
             {
                 return;
@@ -423,8 +438,8 @@ namespace DragonZ.Actb.Core
             {
                 return;
             }
-            var pos = e.GetPosition(_listBox);
-            var hitTestResult = VisualTreeHelper.HitTest(_listBox, pos);
+            var pos = e.GetPosition(ListBox);
+            var hitTestResult = VisualTreeHelper.HitTest(ListBox, pos);
             if (hitTestResult == null)
             {
                 return;
@@ -436,7 +451,7 @@ namespace DragonZ.Actb.Core
                 {
                     var item = (d as ListBoxItem);
                     item.IsSelected = true;
-//                    _listBox.ScrollIntoView(item);
+//                    ListBox.ScrollIntoView(item);
                     break;
                 }
                 d = VisualTreeHelper.GetParent(d);
@@ -459,7 +474,10 @@ namespace DragonZ.Actb.Core
             if (item != null)
             {
                 _popup.IsOpen = false;
-                UpdateText(item.Content as string, true);
+                UpdateText(_dataProvider.GetStringValue(item.Content), true);
+                EventHandler<SelectionAcceptedEventArgs> handler = SelectionAccepted;
+                if (handler != null)
+                    handler(this, new SelectionAcceptedEventArgs { SelectedObject = item.Content });
             }
         }
 
@@ -566,29 +584,28 @@ namespace DragonZ.Actb.Core
           |                                                                     |
           +---------------------------------------------------------------------*/
 
-        private void PopulatePopupList(IEnumerable<string> items)
+        private void PopulatePopupList(IEnumerable<object> items)
         {
             var text = TextBox.Text;
             
-            _listBox.ItemsSource = items;
-            if (_listBox.Items.Count == 0)
+            ListBox.ItemsSource = items;
+            if (ListBox.Items.Count == 0)
             {
                 _popup.IsOpen = false;
                 return;
             }
-            var firstSuggestion = _listBox.Items[0] as string;
-            if (_listBox.Items.Count == 1 && text.Equals(firstSuggestion, StringComparison.OrdinalIgnoreCase))
+            var firstSuggestion = ListBox.Items[0] as string;
+            if (ListBox.Items.Count == 1 && text.Equals(firstSuggestion, StringComparison.OrdinalIgnoreCase))
             {
                 _popup.IsOpen = false;
             }
             else
             {
-                _listBox.SelectedIndex = -1;
+                ListBox.SelectedIndex = -1;
                 _textBeforeChangedByCode = text;
                 _scrollViewer.ScrollToHome();
                 ShowPopup();
 
-                //
                 if (AutoAppend && !_supressAutoAppend &&
                      TextBox.SelectionLength == 0 &&
                      TextBox.SelectionStart == TextBox.Text.Length)
@@ -673,7 +690,7 @@ namespace DragonZ.Actb.Core
             }
             else
             {
-                var visibleCount = Math.Min(16, _listBox.Items.Count + 1);
+                var visibleCount = Math.Min(16, ListBox.Items.Count + 1);
                 popupHeight = visibleCount*_itemHeight + POPUP_SHADOW_DEPTH;
             }
             var screenHeight = SystemParameters.PrimaryScreenHeight;
@@ -699,6 +716,9 @@ namespace DragonZ.Actb.Core
             _popup.VerticalOffset = popupTop;
 
             _popup.IsOpen = true;
+            EventHandler handler = PopupOpened;
+            if (handler != null)
+                handler(this, null);
         }
 
         private void UpdateText(string text, bool selectAll)
